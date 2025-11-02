@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+dist/
+videos/
+*.log
+.DS_Store
+*.min.js
+*.min.css

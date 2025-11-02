@@ -11,7 +11,7 @@ This is a **dual-platform development environment** in early setup phase:
 **Critical Understanding**: This project follows emoji-driven development workflows with aspirational 100% test coverage enforcement.
 
 **Actual Current State**: 
-- **✅ All 8/8 MCP servers configured** - `.vscode/settings.json` contains complete MCP server registry
+- **No .vscode/ directory** - MCP server configurations documented in `BUILD.md` are planned but not implemented
 - **No src/ implementation** - Only empty `src/ui/` directory exists, no actual code files
 - **All npm scripts are placeholders** - `package.json` scripts echo 'not yet implemented'
 - **No public/docs/** - Documentation exists only in root: `BUILD.md`, `TODO.md`, `README.md`
@@ -21,19 +21,10 @@ This is a **dual-platform development environment** in early setup phase:
 
 ## Critical Architecture Patterns
 
-### MCP Server Infrastructure (8/8 Configured ✅)
+### MCP Server Infrastructure (3/8 Active)
 **Location**: `.vscode/settings.json` contains MCP server registry
-**Active Servers**: 
-- ✅ `filesystem` - File operations
-- ✅ `git` - Git version control
-- ✅ `github` - GitHub integration (requires `GITHUB_TOKEN` env var)
-- ✅ `mongodb` - Database operations (connection: `mongodb://localhost:27017`)
-- ✅ `stripe` - Payment processing (requires `STRIPE_SECRET_KEY` env var)
-- ✅ `huggingface` - AI/ML models (requires `HUGGINGFACE_HUB_TOKEN` env var)
-- ✅ `azure-quantum` - Quantum computing (requires workspace config)
-- ✅ `clarity` - Analytics (requires `CLARITY_PROJECT_ID` env var)
-
-**Environment Variables**: All required tokens documented in `.env.example`
+**Active**: `filesystem`, `git`, `github` (all use `npx -y` pattern)
+**Missing**: `mongodb`, `stripe`, `huggingface`, `azure-quantum`, `clarity`
 
 ```jsonc
 // Pattern for adding new MCP servers to .vscode/settings.json
@@ -116,26 +107,38 @@ src/ui/                   # Empty - needs MCP Control Tower implementation
 
 ## MCP Server Configuration Guide
 
-### Environment Setup (Required for MCP Servers)
-All 8 MCP servers are configured in `.vscode/settings.json`. To activate them, copy `.env.example` to `.env` and configure the required tokens:
+### Adding Missing Servers (5/8 Need Setup)
+To add the remaining MCP servers to `.vscode/settings.json`:
 
-```bash
-# Copy environment template
-cp .env.example .env
+```jsonc
+// MongoDB - requires connection string
+"mongodb": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-mongodb", "--connection-string", "mongodb://localhost:27017"]
+},
 
-# Edit .env and add your tokens:
-# - GITHUB_TOKEN=ghp_... (for GitHub integration)
-# - STRIPE_SECRET_KEY=sk_... (already in template)
-# - HUGGINGFACE_HUB_TOKEN=hf_... (for AI/ML models)
-# - AZURE_QUANTUM_WORKSPACE_ID=... (for quantum computing)
-# - CLARITY_PROJECT_ID=... (for analytics)
-```
+// Stripe - requires API keys (set STRIPE_SECRET_KEY env var)  
+"stripe": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-stripe"]
+},
 
-**Server Status Verification**:
-- All servers use `npx -y` pattern for automatic installation
-- Servers auto-start when VS Code loads the workspace
-- Check MCP extension logs for connection status
-- Servers requiring credentials will show connection errors until tokens are configured
+// HuggingFace - requires token (set HUGGINGFACE_HUB_TOKEN env var)
+"huggingface": {
+  "command": "npx", 
+  "args": ["-y", "@modelcontextprotocol/server-huggingface"]
+},
+
+// Azure Quantum - requires workspace config
+"azure-quantum": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-azure-quantum"]
+},
+
+// Microsoft Clarity - requires project ID  
+"clarity": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-microsoft-clarity"]
 }
 ```
 
@@ -157,6 +160,17 @@ cp .env.example .env
 - **JSON**: Uses built-in `vscode.json-language-features`
 - **Tailwind**: CSS validation disabled to prevent conflicts
 - **Spell Check**: Code Spell Checker with `cspell.json` for technical terms
+
+### Adding MCP Servers (5 Missing)
+1. Install: `npm install @modelcontextprotocol/server-{name}`
+2. Configure in `.vscode/settings.json`:
+   ```jsonc
+   "{name}": {
+     "command": "npx",
+     "args": ["-y", "@modelcontextprotocol/server-{name}", "/mnt/f/bambisleep-church"]
+   }
+   ```
+3. Test via VS Code MCP integration
 
 ### MCP Server Integration Patterns
 **Server Lifecycle Management**:
@@ -200,12 +214,11 @@ cp .env.example .env
 4. Separate Unity project structure from Node.js MCP codebase
 
 ### Development Priority Order
-1. **✅ COMPLETE: MCP server configuration** (All 8/8 servers configured in `.vscode/settings.json`)
-2. **Configure environment variables** (Copy `.env.example` to `.env` and add API tokens)
-3. **Achieve 100% test coverage** (coverage infrastructure exists but needs source code)
-4. **Implement actual src/ code** (UI directory empty, but package.json structure ready)
-5. **Set up proper npm scripts** (currently all echo placeholders - replace with real implementations)
-6. **Unity CatGirl avatar system** (follow CATGIRL.md specifications for implementation)
+1. **Complete MCP server configuration** (5 missing servers: mongodb, stripe, huggingface, azure-quantum, clarity)
+2. **Achieve 100% test coverage** (coverage infrastructure exists but needs source code)
+3. **Implement actual src/ code** (UI directory empty, but package.json structure ready)
+4. **Set up proper npm scripts** (currently all echo placeholders - replace with real implementations)
+5. **Unity CatGirl avatar system** (follow CATGIRL.md specifications for implementation)
 
 ### VS Code Integration Patterns
 - Use **emoji-prefixed tasks** for all operations (matches RELIGULOUS_MANTRA.md)

@@ -1,0 +1,271 @@
+{
+  // BambiSleep™ Church - WSL Remote Development Settings
+  // Follow Microsoft WSL + VS Code best practices
+  // https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode
+
+  // ============================================================
+  // MCP (Model Context Protocol) Server Configuration
+  // All servers use npx -y pattern for WSL compatibility
+  // ============================================================
+  "mcp.servers": {
+    // Active File System Operations
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/mnt/f/bambisleep-church"]
+    },
+
+    // Active Git Operations
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "/mnt/f/bambisleep-church"]
+    },
+
+    // Active GitHub Integration (requires GITHUB_TOKEN env var)
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github", "/mnt/f/bambisleep-church"]
+    },
+
+    // MongoDB Database Operations (requires connection string)
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mongodb",
+        "--connection-string",
+        "mongodb://localhost:27017"
+      ]
+    },
+
+    // Stripe Payment Processing (requires STRIPE_SECRET_KEY env var)
+    "stripe": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-stripe"]
+    },
+
+    // HuggingFace AI/ML Models (requires HUGGINGFACE_HUB_TOKEN env var)
+    "huggingface": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-huggingface"]
+    },
+
+    // Azure Quantum Computing (requires workspace config)
+    "azure-quantum": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-azure-quantum"]
+    },
+
+    // Microsoft Clarity Analytics (requires project ID)
+    "clarity": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-microsoft-clarity"]
+    }
+  },
+
+  // ============================================================
+  // GitHub Copilot Configuration
+  // ============================================================
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": true,
+    "javascript": true,
+    "json": true
+  },
+  "github.copilot.advanced": {
+    "organization": "BambiSleepChat"
+  },
+
+  // ============================================================
+  // WSL Remote Development Settings
+  // ============================================================
+  "remote.WSL.useShellEnvironment": true,
+  "remote.WSL.server.connectThroughLocalhost": false,
+
+  // WSL-specific file watching (improves performance)
+  "remote.WSL.fileWatcher.polling": false,
+  "remote.WSL.fileWatcher.pollingInterval": 5000,
+
+  // Terminal configuration for WSL
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "WSL": {
+      "path": "wsl.exe",
+      "icon": "terminal-linux"
+    }
+  },
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "bash",
+      "icon": "terminal-bash"
+    }
+  },
+
+  // Enable shell integration for better WSL terminal experience
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.enablePersistentSessions": true,
+
+  // ============================================================
+  // Editor Configuration (Zero-Config Approach)
+  // ============================================================
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": null,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true,
+  "editor.wordWrap": "on",
+  "editor.rulers": [80, 120],
+
+  // ============================================================
+  // Language-Specific Settings
+  // ============================================================
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ============================================================
+  // File Associations & Exclusions
+  // ============================================================
+  "files.associations": {
+    "*.ejs": "html",
+    "Dockerfile": "dockerfile",
+    "docker-compose.yml": "yaml"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/.DS_Store": true
+  },
+
+  // ============================================================
+  // ESLint Configuration
+  // ============================================================
+  "eslint.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact"
+  ],
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+
+  // ============================================================
+  // CSS & Tailwind Configuration
+  // ============================================================
+  "css.validate": false,
+  "tailwindCSS.emmetCompletions": true,
+
+  // ============================================================
+  // Search Configuration
+  // ============================================================
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/.git": true,
+    "**/videos": true
+  },
+
+  // ============================================================
+  // Git Configuration
+  // ============================================================
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.detectSubmodules": true,
+  "git.ignoreRebaseWarning": false,
+
+  // Git line ending configuration for WSL
+  "files.eol": "\n",
+  "git.branchProtection": ["main", "master"],
+
+  // ============================================================
+  // Code Spell Checker
+  // ============================================================
+  "cSpell.enabled": true,
+  "cSpell.enabledFileTypes": {
+    "git-commit": false
+  },
+
+  // ============================================================
+  // Node.js Configuration
+  // ============================================================
+  "npm.enableRunFromFolder": true,
+  "npm.fetchOnlinePackageInfo": false,
+  "npm.packageManager": "npm",
+
+  // ============================================================
+  // Workspace Trust & Security
+  // ============================================================
+  "security.workspace.trust.enabled": true,
+  "security.workspace.trust.startupPrompt": "once",
+  "security.workspace.trust.emptyWindow": true,
+
+  // ============================================================
+  // WSL-Specific Path Mappings
+  // ============================================================
+  "remote.extensionKind": {
+    "ms-vscode-remote.remote-wsl": ["ui"],
+    "ms-vscode-remote.remote-containers": ["ui"],
+    "ms-vscode-remote.remote-ssh": ["ui"],
+    "github.copilot": ["workspace"],
+    "github.copilot-chat": ["workspace"],
+    "dbaeumer.vscode-eslint": ["workspace"],
+    "esbenp.prettier-vscode": ["workspace"]
+  },
+
+  // ============================================================
+  // Performance & File Watching
+  // ============================================================
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/coverage/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/videos/**": true
+  },
+  "files.hotExit": "onExitAndWindowClose",
+
+  // ============================================================
+  // IntelliSense & Auto-completion
+  // ============================================================
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.suggestSelection": "first",
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  "editor.snippetSuggestions": "top",
+
+  // ============================================================
+  // WSL Performance Optimizations
+  // ============================================================
+  "search.followSymlinks": false,
+  "search.smartCase": true,
+  "extensions.autoUpdate": "onlyEnabledExtensions",
+  "extensions.autoCheckUpdates": true
+}

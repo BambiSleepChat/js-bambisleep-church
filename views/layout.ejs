@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | BambiSleep Church</title>
+  <link rel="stylesheet" href="/css/diablo.css">
+  <link rel="stylesheet" href="/css/sanctuary.css">
+</head>
+<body class="sanctuary">
+  <header class="sanctuary-header">
+    <div class="container">
+      <h1 class="gothic-title">👑 BambiSleep Church</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/markdown/list">Scriptures</a>
+        <% if (user) { %>
+          <a href="/video/watch">Sacred Videos</a>
+          <a href="/auth/logout">Logout</a>
+        <% } else { %>
+          <a href="/auth/login">Enter</a>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sanctuary-main">
+    <%- body %>
+  </main>
+
+  <footer class="sanctuary-footer">
+    <p>© 2025 BambiSleep Church - Aristocratic Sanctuary for the Wicked</p>
+  </footer>
+
+  <script src="/js/websocket.js"></script>
+</body>
+</html>

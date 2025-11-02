@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | BambiSleep Church</title>
+  <link rel="stylesheet" href="/css/diablo.css">
+  <link rel="stylesheet" href="/css/sanctuary.css">
+  <link rel="stylesheet" href="/css/markdown.css">
+</head>
+<body class="sanctuary">
+  <header class="sanctuary-header">
+    <div class="container">
+      <h1 class="gothic-title">👑 BambiSleep Church</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/markdown/list">Scriptures</a>
+        <% if (user) { %>
+          <a href="/video/watch">Sacred Videos</a>
+          <a href="/auth/logout">Logout</a>
+        <% } else { %>
+          <a href="/">Enter</a>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sanctuary-main container">
+    <article class="markdown-content <%= isPaid ? 'premium-content' : 'public-content' %>">
+      <% if (isPaid) { %>
+        <div class="premium-badge">👑 Premium Content</div>
+      <% } %>
+      
+      <%- content %>
+    </article>
+
+    <% if (isPaid && subscription) { %>
+      <div class="subscription-info">
+        <p>Subscription Active until: <%= new Date(subscription.current_period_end * 1000).toLocaleDateString() %></p>
+      </div>
+    <% } %>
+  </main>
+
+  <footer class="sanctuary-footer">
+    <p>© 2025 BambiSleep Church</p>
+  </footer>
+</body>
+</html>

@@ -10,6 +10,119 @@ This is a **dual-platform development environment** requiring specialized build 
 
 **Critical Understanding**: This project uses emoji-driven development with 100% test coverage enforcement and requires VS Code task-based workflows instead of direct npm commands.
 
+---
+
+## 🐧 Phase 0: WSL Remote Development Setup (NEW - HIGH PRIORITY)
+
+### 0.1 Install & Configure WSL 2
+
+**Purpose**: Enable seamless cross-platform development between Windows and Linux environments following Microsoft best practices.
+
+**Reference**: [Microsoft Learn - WSL + VS Code Tutorial](https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode)
+
+```powershell
+# PowerShell (as Administrator)
+wsl --install
+wsl --set-default-version 2
+
+# Verify installation
+wsl --list --verbose
+```
+
+### 0.2 Install VS Code Remote Development Extension Pack
+
+**Required Extensions**:
+- `ms-vscode-remote.vscode-remote-extensionpack` (includes WSL, SSH, Containers)
+- `ms-vscode-remote.remote-wsl` (WSL integration)
+
+**Installation**:
+1. Open VS Code on Windows
+2. Install Remote Development extension pack from Marketplace
+3. Restart VS Code
+
+### 0.3 Open Project in WSL Mode
+
+```powershell
+# Method A: From Windows
+cd f:\bambisleep-church
+code .
+# Then: Ctrl+Shift+P → "WSL: Reopen Folder in WSL"
+
+# Method B: From WSL
+wsl
+cd /mnt/f/bambisleep-church
+code .
+```
+
+**Verification**:
+- Check bottom-left corner of VS Code for "WSL: Ubuntu" indicator
+- All extensions configured in `.vscode/extensions.json` will auto-install in WSL
+
+### 0.4 Configure Development Environment in WSL
+
+```bash
+# Inside WSL terminal in VS Code
+# 1. Update system
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get install -y wget ca-certificates curl git build-essential
+
+# 2. Install Node.js 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# 3. Verify versions
+node --version  # Should be >=20.0.0
+npm --version   # Should be >=10.0.0
+
+# 4. Install project dependencies
+npm install
+
+# 5. Configure environment
+cp .env.example .env
+# Edit .env with your API tokens
+```
+
+### 0.5 Verify MCP Server Configuration
+
+All 8 MCP servers are pre-configured in `.vscode/settings.json`:
+
+✅ **filesystem** - File operations  
+✅ **git** - Git version control  
+✅ **github** - GitHub integration (requires `GITHUB_TOKEN` env var)  
+✅ **mongodb** - Database operations  
+✅ **stripe** - Payment processing (requires `STRIPE_SECRET_KEY` env var)  
+✅ **huggingface** - AI/ML models (requires `HUGGINGFACE_HUB_TOKEN` env var)  
+✅ **azure-quantum** - Quantum computing  
+✅ **clarity** - Analytics (requires `CLARITY_PROJECT_ID` env var)  
+
+**Configuration Check**:
+```bash
+# Verify npx is available
+which npx
+npx --version
+
+# Test MCP server availability (example)
+npx -y @modelcontextprotocol/server-filesystem --help
+```
+
+### 0.6 Run Initial Tests
+
+```bash
+# Inside WSL terminal
+npm test           # Run tests with coverage
+npm run lint       # Check code quality
+npm run dev        # Start development server
+```
+
+**Expected Results**:
+- Tests pass (current coverage: ~79%)
+- ESLint runs without errors
+- Server starts at `http://localhost:3000`
+
+**Complete Documentation**: See `public/docs/WSL_SETUP_GUIDE.md` for detailed troubleshooting and performance optimization.
+
+---
+
 ## 🚀 Phase 1: Foundation Setup (Infrastructure)
 
 ### 1.1 Environment Prerequisites

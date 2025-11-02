@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | BambiSleep Church</title>
+  <link rel="stylesheet" href="/css/diablo.css">
+  <link rel="stylesheet" href="/css/sanctuary.css">
+</head>
+<body class="sanctuary">
+  <div class="hellfire-background"></div>
+  
+  <header class="sanctuary-header">
+    <div class="container">
+      <h1 class="gothic-title">👑 BambiSleep Church</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/markdown/list">Scriptures</a>
+        <% if (user) { %>
+          <a href="/video/watch">Sacred Videos</a>
+          <a href="/auth/logout">Logout (<%= user.name %>)</a>
+        <% } else { %>
+          <a href="#login">Enter the Sanctuary</a>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sanctuary-main container">
+    <div class="welcome-portal">
+      <h2 class="flame-text">Welcome to the Hellfire Sanctuary</h2>
+      <p class="gothic-description">
+        A private paywalled sanctuary for the wicked, styled in the unholy elegance 
+        of Diablo 1's Tristram Cathedral. Here, aristocratic seekers find sacred knowledge,
+        forbidden videos, and live avatar interactions in a realm of refined darkness.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>📜 Sacred Scriptures</h3>
+          <p>Markdown-rendered documents of forbidden knowledge</p>
+          <a href="/markdown/public/welcome.md" class="btn-gothic">Read Public Texts</a>
+        </div>
+
+        <div class="feature-card">
+          <h3>🎥 Paywalled Videos</h3>
+          <p>Exclusive video content with FFmpeg streaming</p>
+          <% if (user) { %>
+            <a href="/video/watch" class="btn-gothic">Enter Video Sanctum</a>
+          <% } else { %>
+            <a href="#subscribe" class="btn-gothic-disabled">Subscription Required</a>
+          <% } %>
+        </div>
+
+        <div class="feature-card">
+          <h3>⚡ Live WebSocket</h3>
+          <p>Real-time avatar interactions and notifications</p>
+          <button id="ws-connect" class="btn-gothic">Connect to Realm</button>
+        </div>
+
+        <div class="feature-card">
+          <h3>💳 Stripe Paywall</h3>
+          <p>Secure subscription management</p>
+          <% if (user) { %>
+            <a href="/stripe/subscription-status" class="btn-gothic">Manage Subscription</a>
+          <% } else { %>
+            <a href="#register" class="btn-gothic">Register & Subscribe</a>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (!user) { %>
+        <div class="auth-portal" id="login">
+          <h3>Enter the Sanctuary</h3>
+          <form id="login-form" class="gothic-form">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" class="btn-gothic">Login</button>
+          </form>
+          <p class="or-divider">or</p>
+          <a href="#register" class="btn-gothic-outline">Register New Account</a>
+        </div>
+      <% } %>
+    </div>
+
+    <div id="ws-status" class="ws-status"></div>
+  </main>
+
+  <footer class="sanctuary-footer">
+    <p>© 2025 BambiSleep Church - Aristocratic Sanctuary for the Wicked</p>
+    <p class="hellfire-motto">"In darkness, we find refinement"</p>
+  </footer>
+
+  <script src="/js/websocket.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

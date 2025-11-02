@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | BambiSleep Church</title>
+  <link rel="stylesheet" href="/css/diablo.css">
+  <link rel="stylesheet" href="/css/sanctuary.css">
+  <link rel="stylesheet" href="/css/video-player.css">
+</head>
+<body class="sanctuary video-sanctuary">
+  <header class="sanctuary-header">
+    <div class="container">
+      <h1 class="gothic-title">👑 Sacred Video Sanctum</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/markdown/list">Scriptures</a>
+        <a href="/auth/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sanctuary-main container">
+    <div class="video-container-wrapper">
+      <div id="video-container" class="hellfire-video-frame">
+        <video id="video-player" class="aristocratic-player" controls>
+          <source id="video-source" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+
+        <div id="avatar-overlay" class="avatar-overlay bottom-right">
+          <canvas id="avatar-canvas" width="200" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="video-controls-panel">
+        <h3>Video: <%= videoId %></h3>
+        <p class="subscription-notice">
+          Premium content - Subscription active until: 
+          <%= new Date(subscription.current_period_end * 1000).toLocaleDateString() %>
+        </p>
+        <div id="video-status" class="status-display"></div>
+      </div>
+    </div>
+
+    <div id="ws-status" class="ws-status"></div>
+  </main>
+
+  <footer class="sanctuary-footer">
+    <p>© 2025 BambiSleep Church</p>
+  </footer>
+
+  <script>
+    const videoId = '<%= videoId %>';
+  </script>
+  <script src="/js/websocket.js"></script>
+  <script src="/js/video-player.js"></script>
+</body>
+</html>

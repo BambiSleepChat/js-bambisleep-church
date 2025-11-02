@@ -1,0 +1,321 @@
+{
+  // BambiSleep™ Church - VS Code Task Configuration
+  // Emoji-driven development workflows following RELIGULOUS_MANTRA.md
+  "version": "2.0.0",
+  "tasks": [
+    // ============================================================
+    // 🌸 CHERRY_BLOSSOM - Package Management & npm Operations
+    // ============================================================
+    {
+      "label": "🌸 Install Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🌸 Update Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["update"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🌸 Audit Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["audit", "fix"],
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // 💎 GEM - Quality Metrics & Test Coverage Enforcement
+    // ============================================================
+    {
+      "label": "💎 Run Tests (100% Coverage)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "💎 Run Tests (Watch Mode)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "test:watch"],
+      "group": "test",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "💎 Lint Code",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "lint"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "💎 Format Code",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "format"],
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // 🌀 CYCLONE - Build & Compilation Processes
+    // ============================================================
+    {
+      "label": "🌀 Build Project",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "🌀 Build UI Components",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "build:ui"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🌀 Build Docker Image",
+      "type": "shell",
+      "command": "docker",
+      "args": ["build", "-t", "bambisleep-church:latest", "."],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // ✨ SPARKLES - Server Operations & MCP Management
+    // ============================================================
+    {
+      "label": "✨ Start Control Tower (Dev)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\s].*)\\((\\d+),(\\d+)\\):\\s+(warning|error)\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting.*$",
+          "endsPattern": "^.*Server running.*$"
+        }
+      }
+    },
+    {
+      "label": "✨ Start Control Tower (Production)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["start"],
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "✨ Start Docker Compose",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": ["up", "-d"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "✨ Stop Docker Compose",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": ["down"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "✨ Verify MCP Servers",
+      "type": "shell",
+      "command": "echo",
+      "args": ["'Checking MCP server status in VS Code extensions...'"],
+      "group": "test",
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // 🎭 PERFORMING_ARTS - Development Lifecycle & Deployment
+    // ============================================================
+    {
+      "label": "🎭 Full Development Cycle",
+      "dependsOn": [
+        "🌸 Install Dependencies",
+        "💎 Lint Code",
+        "💎 Run Tests (100% Coverage)",
+        "🌀 Build Project"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🎭 Clean & Rebuild",
+      "type": "shell",
+      "command": "rm",
+      "args": ["-rf", "node_modules", "coverage", "dist", "&&", "npm", "install"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🎭 Deploy to Production",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "deploy"],
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // 👑 CROWN - Architecture & Major Refactoring
+    // ============================================================
+    {
+      "label": "👑 Analyze Bundle Size",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "analyze"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "👑 Generate Documentation",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "docs"],
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // 🦋 BUTTERFLY - Transformation & Migration Processes
+    // ============================================================
+    {
+      "label": "🦋 Database Migration",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "migrate"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🦋 Update Documentation",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "docs:update"],
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // WSL-Specific Tasks
+    // ============================================================
+    {
+      "label": "🐧 Open in WSL",
+      "type": "shell",
+      "command": "wsl",
+      "args": ["cd", "/mnt/f/bambisleep-church", "&&", "code", "."],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🐧 WSL Environment Check",
+      "type": "shell",
+      "command": "wsl",
+      "args": ["--list", "--verbose"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+
+    // ============================================================
+    // Health Check & Diagnostics
+    // ============================================================
+    {
+      "label": "🏥 Health Check",
+      "type": "shell",
+      "command": "curl",
+      "args": ["http://localhost:3000/health"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "🏥 System Diagnostics",
+      "type": "shell",
+      "command": "node",
+      "args": ["--version", "&&", "npm", "--version", "&&", "git", "--version"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

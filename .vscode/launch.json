@@ -1,0 +1,139 @@
+{
+  // BambiSleep™ Church - Debug & Launch Configuration
+  // WSL Remote Development compatible
+  "version": "0.2.0",
+  "configurations": [
+    
+    // ============================================================
+    // Node.js Server Debugging
+    // ============================================================
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🚀 Launch Server (Development)",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/src/server.js",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "3000"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "restart": true,
+      "runtimeArgs": ["--experimental-modules"],
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🚀 Launch Server (Production)",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/src/server.js",
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "3000"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "🔗 Attach to Process",
+      "port": 9229,
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+
+    // ============================================================
+    // Jest Testing
+    // ============================================================
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Jest Tests (Current File)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["${fileBasename}", "--runInBand", "--coverage", "--verbose"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Jest Tests (All)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--runInBand", "--coverage", "--verbose"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Jest Tests (Watch Mode)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--watch", "--coverage"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+
+    // ============================================================
+    // Browser Debugging (for frontend)
+    // ============================================================
+    {
+      "type": "msedge",
+      "request": "launch",
+      "name": "🌐 Launch Edge",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/public",
+      "sourceMaps": true,
+      "userDataDir": false
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "🌐 Launch Chrome",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/public",
+      "sourceMaps": true,
+      "userDataDir": false
+    },
+
+    // ============================================================
+    // Docker Container Debugging
+    // ============================================================
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "🐳 Docker: Attach to Node",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "restart": true
+    }
+  ],
+
+  // ============================================================
+  // Compound Configurations
+  // ============================================================
+  "compounds": [
+    {
+      "name": "🚀🌐 Server + Browser",
+      "configurations": ["🚀 Launch Server (Development)", "🌐 Launch Edge"],
+      "stopAll": true
+    },
+    {
+      "name": "🧪🚀 Tests + Server",
+      "configurations": ["🧪 Jest Tests (Watch Mode)", "🚀 Launch Server (Development)"],
+      "stopAll": true
+    }
+  ]
+}

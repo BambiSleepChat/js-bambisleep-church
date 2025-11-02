@@ -1,0 +1,123 @@
+{
+  "recommendations": [
+    // ============================================================
+    // CRITICAL: WSL Remote Development Extension Pack
+    // ============================================================
+    "ms-vscode-remote.vscode-remote-extensionpack",
+    "ms-vscode-remote.remote-wsl",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-containers",
+
+    // ============================================================
+    // GitHub Integration & Copilot
+    // ============================================================
+    "github.copilot",
+    "github.copilot-chat",
+    "github.vscode-pull-request-github",
+
+    // ============================================================
+    // Code Quality & Linting
+    // ============================================================
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+
+    // ============================================================
+    // JavaScript & Node.js Development
+    // ============================================================
+    "christian-kohler.npm-intellisense",
+    "eg2.vscode-npm-script",
+    "xabikos.javascriptsnippets",
+
+    // ============================================================
+    // Docker & Container Support
+    // ============================================================
+    "ms-azuretools.vscode-docker",
+
+    // ============================================================
+    // Testing & Coverage
+    // ============================================================
+    "orta.vscode-jest",
+    "ryanluker.vscode-coverage-gutters",
+
+    // ============================================================
+    // Markdown & Documentation
+    // ============================================================
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "bierner.markdown-emoji",
+    "bierner.markdown-preview-github-styles",
+
+    // ============================================================
+    // Git & Version Control
+    // ============================================================
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "donjayamanne.githistory",
+
+    // ============================================================
+    // Code Spell Checker
+    // ============================================================
+    "streetsidesoftware.code-spell-checker",
+
+    // ============================================================
+    // HTML & Template Support (EJS)
+    // ============================================================
+    "digitalbrainstem.javascript-ejs-support",
+    "j69.ejs-beautify",
+
+    // ============================================================
+    // CSS & Styling
+    // ============================================================
+    "bradlc.vscode-tailwindcss",
+    "zignd.html-css-class-completion",
+
+    // ============================================================
+    // Environment Variables
+    // ============================================================
+    "mikestead.dotenv",
+
+    // ============================================================
+    // Path Intelligence
+    // ============================================================
+    "christian-kohler.path-intellisense",
+
+    // ============================================================
+    // Productivity & UI Enhancements
+    // ============================================================
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "usernamehw.errorlens",
+    "wayou.vscode-todo-highlight",
+
+    // ============================================================
+    // JSON & YAML Support
+    // ============================================================
+    "redhat.vscode-yaml",
+
+    // ============================================================
+    // REST API Testing
+    // ============================================================
+    "humao.rest-client",
+
+    // ============================================================
+    // MongoDB Support
+    // ============================================================
+    "mongodb.mongodb-vscode",
+
+    // ============================================================
+    // Live Server (for static content testing)
+    // ============================================================
+    "ritwickdey.liveserver",
+
+    // ============================================================
+    // Import Cost Analysis
+    // ============================================================
+    "wix.vscode-import-cost",
+
+    // ============================================================
+    // Code Metrics
+    // ============================================================
+    "kisstkondoros.vscode-codemetrics"
+  ]
+}

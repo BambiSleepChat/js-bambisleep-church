@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - BambiSleep Church</title>
+  <link rel="stylesheet" href="/css/diablo.css">
+  <link rel="stylesheet" href="/css/sanctuary.css">
+</head>
+<body class="sanctuary">
+  <header class="sanctuary-header">
+    <div class="container">
+      <h1 class="gothic-title">👑 BambiSleep Church</h1>
+      <nav>
+        <a href="/">Return Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="sanctuary-main container">
+    <div class="error-container">
+      <h2 class="flame-text">Error</h2>
+      <h3><%= message %></h3>
+      <% if (error && error.stack) { %>
+        <pre class="error-stack"><%= error.stack %></pre>
+      <% } %>
+      <a href="/" class="btn-gothic">Return to Safety</a>
+    </div>
+  </main>
+
+  <footer class="sanctuary-footer">
+    <p>© 2025 BambiSleep Church</p>
+  </footer>
+
+  <style>
+    .error-container {
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--hellfire-red);
+      padding: 2rem;
+      border-radius: 8px;
+      margin: 2rem auto;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    .error-stack {
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--hellfire-orange);
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: left;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      margin-top: 1.5rem;
+    }
+
+    .not-found {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .not-found h2 {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+    }
+
+    .not-found code {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: var(--hellfire-orange);
+    }
+  </style>
+</body>
+</html>
