@@ -66,7 +66,7 @@ Complete transformation to Microsoft's recommended WSL + VS Code development env
 - **Microsoft Clarity** - Analytics (configured, requires `CLARITY_PROJECT_ID`)
 
 #### Documentation
-- **`public/docs/WSL_SETUP_GUIDE.md`** (450 lines)
+- **`docs/WSL_SETUP_GUIDE.md`** (450 lines)
   - Complete WSL 2 installation guide
   - VS Code Remote Development setup
   - Project-specific configuration steps
@@ -77,7 +77,7 @@ Complete transformation to Microsoft's recommended WSL + VS Code development env
   - Performance optimization tips for WSL 2
   - Verification checklist (15 items)
   
-- **`UPGRADE_SUMMARY.md`** (400+ lines)
+- **`docs/UPGRADE_SUMMARY.md`** (400+ lines)
   - Complete upgrade overview
   - Before/after comparisons
   - Technical specifications

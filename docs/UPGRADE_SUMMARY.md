@@ -65,7 +65,7 @@ This upgrade implements Microsoft's official WSL + VS Code Remote Development be
 
 ### Documentation
 
-5. **`public/docs/WSL_SETUP_GUIDE.md`** (450 lines)
+5. **`docs/WSL_SETUP_GUIDE.md`** (450 lines)
    - Complete WSL 2 installation guide
    - VS Code Remote Development setup
    - Project-specific configuration
@@ -320,14 +320,12 @@ npm run pm2:start     # Production deployment with PM2
 ## 📚 Documentation References
 
 ### Created Documentation
-- `public/docs/WSL_SETUP_GUIDE.md` - Complete WSL setup (450 lines)
+- `docs/WSL_SETUP_GUIDE.md` - Complete WSL setup (450 lines)
 - `BUILD.md` Phase 0 - Quick WSL integration steps
 
 ### Existing Documentation
 - `BUILD.md` - Complete build process (now 528 lines)
 - `TODO.md` - Implementation checklist
-- `public/docs/MCP_SETUP_GUIDE.md` - MCP server details
-- `public/docs/RELIGULOUS_MANTRA.md` - Emoji commit patterns
 - `public/docs/CATGIRL.md` - Unity avatar specifications
 
 ### External References
@@ -371,7 +369,7 @@ npm run pm2:start     # Production deployment with PM2
 
 ### Immediate Actions
 
-1. **Install WSL 2**: Follow `public/docs/WSL_SETUP_GUIDE.md`
+1. **Install WSL 2**: Follow `docs/WSL_SETUP_GUIDE.md`
 2. **Configure Environment**: Set up `.env` with API tokens
 3. **Install Dependencies**: Run `npm install` in WSL
 4. **Verify MCP Servers**: Check VS Code extension logs
@@ -402,7 +400,7 @@ npm run pm2:start     # Production deployment with PM2
 ## 🔗 Quick Links
 
 - **Main Documentation**: `BUILD.md`
-- **WSL Setup**: `public/docs/WSL_SETUP_GUIDE.md`
+- **WSL Setup**: `docs/WSL_SETUP_GUIDE.md`
 - **MCP Configuration**: `.vscode/settings.json`
 - **Task Reference**: `.vscode/tasks.json`
 - **Repository**: [BambiSleepChat/js-bambisleep-church](https://github.com/BambiSleepChat/js-bambisleep-church)

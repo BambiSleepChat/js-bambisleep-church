@@ -119,7 +119,7 @@ npm run dev        # Start development server
 - ESLint runs without errors
 - Server starts at `http://localhost:3000`
 
-**Complete Documentation**: See `public/docs/WSL_SETUP_GUIDE.md` for detailed troubleshooting and performance optimization.
+**Complete Documentation**: See `docs/WSL_SETUP_GUIDE.md` for detailed troubleshooting and performance optimization.
 
 ---
 
