@@ -69,6 +69,32 @@ powershell -ExecutionPolicy Bypass -File script.ps1
 - **WSL paths**: `/mnt/f/bambisleep-church` (for MCP servers)
 - **Node.js code**: Use forward slashes (works on both Windows/Linux)
 
+### **⚠️ CRITICAL: WSL File Storage Performance**
+
+**Store files on the SAME filesystem as the tools using them:**
+
+```bash
+# ❌ SLOW: Storing in Windows filesystem, working in WSL
+# /mnt/f/bambisleep-church (Windows F: drive accessed via WSL)
+# Performance: ~10x slower for git, npm, file watching
+
+# ✅ FAST: Storing in WSL filesystem, working in WSL
+# \\wsl$\Debian\home\melkanea\bambisleep-church (native WSL)
+# Performance: Native Linux filesystem speed
+```
+
+**Microsoft's Rule:**
+- **Linux tools + WSL terminal** → Store in WSL filesystem (`/home/user/project`)
+- **Windows tools + PowerShell** → Store in Windows filesystem (`/mnt/f/project`)
+- **Mixed development** → Accept performance tradeoff OR maintain 2 clones
+
+**Current Project Location:** `/mnt/f/CATHEDRAL` (Windows drive via WSL)
+- **Best for:** Windows-centric development (VS Code Windows, PowerShell scripts)
+- **Slower for:** `git` operations, `npm install`, `nodemon` file watching
+- **Migration path:** `cp -r /mnt/f/CATHEDRAL ~/CATHEDRAL` for full Linux speed
+
+**Reference:** [Microsoft WSL File Storage Guide](https://learn.microsoft.com/en-gb/windows/wsl/setup/environment#file-storage)
+
 ### **WSL Integration**
 ```powershell
 # Open project in WSL from Windows

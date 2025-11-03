@@ -12,20 +12,21 @@ This directory contains all essential documentation for understanding, developin
 .github/codebase/
 ├── README.md                    # This file - navigation hub
 ├── architecture/
-│   └── architecture.md          # 8-layer system design (178 lines)
+│   └── architecture.md          # 8-layer system design (218 lines)
 ├── development/
-│   └── development.md           # Workflow & testing (112 lines)
+│   ├── development.md           # Workflow & testing (145 lines)
+│   └── wsl-performance.md       # WSL file storage (250 lines) ⚡
 ├── integration/
-│   └── mcp-servers.md           # 8 MCP servers (97 lines)
+│   └── mcp-servers.md           # 8 MCP servers (134 lines)
 ├── operations/
-│   └── monitoring.md            # Observability stack (159 lines)
+│   └── monitoring.md            # Observability stack (232 lines)
 ├── philosophy/
-│   └── philosophy.md            # 6 Genesis Questions (73 lines)
+│   └── philosophy.md            # 6 Genesis Questions (126 lines)
 └── reference/
-    └── QUICK_REFERENCE.md       # Commands & setup (180 lines)
+    └── QUICK_REFERENCE.md       # Commands & setup (244 lines)
 ```
 
-**Total:** ~800 lines of focused documentation
+**Total:** ~1,350 lines of focused documentation
 
 ---
 
@@ -40,6 +41,7 @@ This directory contains all essential documentation for understanding, developin
 **Folder:** `development/`
 
 - **[development.md](development/development.md)** - VS Code workflows, Windows/PowerShell, testing, emoji git commits
+- **[wsl-performance.md](development/wsl-performance.md)** - ⚡ WSL file storage best practices (5-10x speedup)
 
 ### 🤖 MCP Integration
 **Folder:** `integration/`
@@ -67,9 +69,10 @@ This directory contains all essential documentation for understanding, developin
 
 ### New Developers
 1. `philosophy/philosophy.md` - Understand the "why"
-2. `architecture/architecture.md` - Learn the structure
-3. `development/development.md` - Set up workflow
-4. `reference/QUICK_REFERENCE.md` - Get commands
+2. `development/wsl-performance.md` - ⚡ Performance setup (WSL users)
+3. `architecture/architecture.md` - Learn the structure
+4. `development/development.md` - Set up workflow
+5. `reference/QUICK_REFERENCE.md` - Get commands
 
 ### AI Agents
 1. `architecture/architecture.md` - System structure and patterns
@@ -89,6 +92,7 @@ This directory contains all essential documentation for understanding, developin
 |-------|----------|-------------|
 | System Architecture | architecture.md | 8-layer lattice, security patterns |
 | Development Setup | development.md | VS Code tasks, Windows/PowerShell |
+| **WSL Performance** | **wsl-performance.md** | **File storage, 5-10x speedup ⚡** |
 | AI Integration | mcp-servers.md | 8 MCP servers, environment vars |
 | Observability | monitoring.md | Prometheus, Grafana, 6 dashboards |
 | System Intent | philosophy.md | 6 Genesis Questions, invariants |

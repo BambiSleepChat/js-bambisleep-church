@@ -1,0 +1,349 @@
+{
+  "dashboard": {
+    "title": "BambiSleep Church - WebSocket Real-Time",
+    "tags": [
+      "websocket",
+      "realtime",
+      "connections"
+    ],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Connections",
+        "type": "stat",
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "websocket_connections_active",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "blue"
+                },
+                {
+                  "value": 10,
+                  "color": "green"
+                },
+                {
+                  "value": 50,
+                  "color": "yellow"
+                },
+                {
+                  "value": 100,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total Connections (24h)",
+        "type": "stat",
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "increase(websocket_connections_total[24h])",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "blue"
+                },
+                {
+                  "value": 100,
+                  "color": "green"
+                },
+                {
+                  "value": 1000,
+                  "color": "yellow"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Messages/Second",
+        "type": "stat",
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(websocket_messages_total[1m]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "blue"
+                },
+                {
+                  "value": 10,
+                  "color": "green"
+                },
+                {
+                  "value": 100,
+                  "color": "yellow"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Auth Success Rate",
+        "type": "stat",
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "rate(auth_attempts_total{method=\"websocket\",outcome=\"success\"}[5m]) / rate(auth_attempts_total{method=\"websocket\"}[5m]) * 100",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "red"
+                },
+                {
+                  "value": 80,
+                  "color": "yellow"
+                },
+                {
+                  "value": 95,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Connection Lifecycle",
+        "type": "graph",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 6
+        },
+        "targets": [
+          {
+            "expr": "websocket_connections_active",
+            "legendFormat": "Active Connections",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(websocket_connections_total[1m]) * 60",
+            "legendFormat": "New Connections/min",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Connections"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Message Flow",
+        "type": "graph",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 6
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(websocket_messages_total{direction=\"inbound\"}[1m])) by (message_type)",
+            "legendFormat": "Inbound - {{message_type}}",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(websocket_messages_total{direction=\"outbound\"}[1m])) by (message_type)",
+            "legendFormat": "Outbound - {{message_type}}",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Messages/sec"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Messages by Type (Inbound)",
+        "type": "piechart",
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "sum(increase(websocket_messages_total{direction=\"inbound\"}[1h])) by (message_type)",
+            "legendFormat": "{{message_type}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "legend": {
+            "display": true,
+            "placement": "right"
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "WebSocket Authentication",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(auth_attempts_total{method=\"websocket\",outcome=\"success\"}[5m]))",
+            "legendFormat": "Successful Auth",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(auth_attempts_total{method=\"websocket\",outcome=\"failed\"}[5m]))",
+            "legendFormat": "Failed Auth",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Attempts/sec"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Connection Duration Distribution",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, rate(websocket_connection_duration_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(websocket_connection_duration_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(websocket_connection_duration_bucket[5m]))",
+            "legendFormat": "p99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Duration"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      }
+    ]
+  }
+}

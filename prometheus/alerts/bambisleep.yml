@@ -1,0 +1,140 @@
+groups:
+  - name: bambisleep_alerts
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High HTTP error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # High response time
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95,
+            rate(http_request_duration_seconds_bucket[5m])
+          ) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP response time"
+          description: "95th percentile response time is {{ $value }}s"
+
+      # Failed authentication attempts
+      - alert: HighAuthenticationFailures
+        expr: |
+          rate(auth_attempts_total{outcome=~"failed.*"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "{{ $value }} failed auth attempts per second over last 5 minutes"
+
+      # Stripe webhook failures
+      - alert: StripeWebhookFailures
+        expr: |
+          rate(stripe_webhooks_total{status="failed"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Stripe webhook failures detected"
+          description: "Failing to process Stripe webhooks - payment processing may be affected"
+
+      # Low subscription count
+      - alert: LowSubscriptionCount
+        expr: stripe_subscriptions_active < 1
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "No active subscriptions"
+          description: "Active subscription count is {{ $value }}"
+
+      # WebSocket connection issues
+      - alert: WebSocketConnectionDrop
+        expr: |
+          rate(websocket_connections_total[5m]) < 0
+          and
+          websocket_connections_active > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WebSocket connections dropping"
+          description: "WebSocket connections are being dropped unexpectedly"
+
+      # Security events
+      - alert: SecurityEventsDetected
+        expr: |
+          rate(security_events_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High rate of security events"
+          description: "{{ $value }} security events per second - possible attack in progress"
+
+      # Rate limit hits
+      - alert: HighRateLimitHits
+        expr: |
+          rate(rate_limit_hits_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High rate of rate limit hits"
+          description: "{{ $value }} rate limit hits per second - possible DoS attempt"
+
+      # Service down
+      - alert: ServiceDown
+        expr: up{job="bambisleep-church"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "BambiSleep Church service is down"
+          description: "The service has been down for more than 1 minute"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes > 1073741824
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanize1024 }}B"
+
+      # DORA: High change failure rate
+      - alert: HighChangeFailureRate
+        expr: change_failure_rate > 0.15
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "High change failure rate"
+          description: "Change failure rate is {{ $value | humanizePercentage }} (threshold: 15%)"
+
+      # DORA: High MTTR
+      - alert: HighMTTR
+        expr: |
+          rate(mttr_seconds_sum[1d]) / rate(mttr_seconds_count[1d]) > 3600
+        for: 6h
+        labels:
+          severity: warning
+        annotations:
+          summary: "High mean time to recovery"
+          description: "MTTR is {{ $value | humanizeDuration }} (threshold: 1 hour)"

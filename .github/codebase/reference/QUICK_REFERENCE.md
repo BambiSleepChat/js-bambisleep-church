@@ -4,6 +4,19 @@
 
 ---
 
+## ⚡ Performance Alert: WSL File Storage
+
+**CRITICAL:** If using WSL, store project files in the SAME filesystem as your tools:
+
+- **❌ SLOW:** `/mnt/f/CATHEDRAL` (Windows drive via WSL) → 10x slower I/O
+- **✅ FAST:** `~/CATHEDRAL` or `\\wsl$\Debian\home\user\CATHEDRAL` → Native speed
+
+**Impact:** `git`, `npm install`, `nodemon` file watching, Docker volumes  
+**Rule:** Linux tools → WSL filesystem | Windows tools → Windows filesystem  
+**Details:** See [development.md - WSL File Storage](../development/development.md#-critical-wsl-file-storage-performance)
+
+---
+
 ## 🚀 Essential Commands (Via VS Code Tasks)
 
 Press `Ctrl+Shift+P` → "Run Task" → Select:

@@ -1,0 +1,363 @@
+{
+  "dashboard": {
+    "title": "BambiSleep Church - Stripe Payments & Revenue",
+    "tags": [
+      "stripe",
+      "payments",
+      "revenue",
+      "business"
+    ],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Revenue (24h)",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "sum(increase(stripe_payment_value_total[24h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "blue"
+                },
+                {
+                  "value": 100,
+                  "color": "green"
+                },
+                {
+                  "value": 1000,
+                  "color": "yellow"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Subscriptions",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "stripe_subscriptions_active",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "red"
+                },
+                {
+                  "value": 1,
+                  "color": "yellow"
+                },
+                {
+                  "value": 10,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Webhook Success Rate",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "rate(stripe_webhooks_total{status=\"verified\"}[5m]) / rate(stripe_webhooks_total[5m]) * 100",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "red"
+                },
+                {
+                  "value": 95,
+                  "color": "yellow"
+                },
+                {
+                  "value": 99,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Payment Failures (1h)",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "sum(increase(stripe_webhooks_total{event_type=\"invoice.payment_failed\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "green"
+                },
+                {
+                  "value": 1,
+                  "color": "yellow"
+                },
+                {
+                  "value": 5,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Revenue by Currency",
+        "type": "graph",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(stripe_payment_value_total[1h])) by (currency)",
+            "legendFormat": "{{currency}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "currencyUSD",
+            "label": "Revenue/hour"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Subscription Growth",
+        "type": "graph",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "stripe_subscriptions_active",
+            "legendFormat": "Active Subscriptions",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Subscriptions"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Webhook Events by Type",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 18
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(stripe_webhooks_total[5m])) by (event_type)",
+            "legendFormat": "{{event_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Events/sec"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Webhook Status Distribution",
+        "type": "piechart",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 18
+        },
+        "targets": [
+          {
+            "expr": "sum(increase(stripe_webhooks_total[1h])) by (status)",
+            "legendFormat": "{{status}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "legend": {
+            "display": true,
+            "placement": "right"
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Payment Processing Timeline",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 26
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(stripe_webhooks_total{event_type=\"payment_intent.succeeded\"}[5m]))",
+            "legendFormat": "Successful Payments",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(stripe_webhooks_total{event_type=\"payment_intent.failed\"}[5m]))",
+            "legendFormat": "Failed Payments",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(stripe_webhooks_total{event_type=\"invoice.payment_failed\"}[5m]))",
+            "legendFormat": "Invoice Failures",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Events/sec"
+          },
+          {
+            "format": "short"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [
+                  1
+                ],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": [
+                  "C",
+                  "5m",
+                  "now"
+                ]
+              },
+              "reducer": {
+                "params": [],
+                "type": "avg"
+              },
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Payment Failures Alert",
+          "noDataState": "no_data"
+        }
+      }
+    ]
+  }
+}

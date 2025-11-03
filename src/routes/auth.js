@@ -2,6 +2,13 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Stripe from 'stripe';
+import {
+  logger,
+  trackAuthAttempt,
+  trackSecurityEvent,
+  authSessionsActive,
+  userRegistrations,
+} from '../services/telemetry.js';
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -18,11 +25,19 @@ router.post('/register', async (req, res) => {
 
     // Validate input
     if (!email || !password || !name) {
-      return res.status(400).json({ error: 'Email, password, and name are required' });
+      trackAuthAttempt('registration', 'failed_validation');
+      return res
+        .status(400)
+        .json({ error: 'Email, password, and name are required' });
     }
 
     // Check if user exists
     if (users.has(email)) {
+      trackAuthAttempt('registration', 'failed_exists');
+      trackSecurityEvent('duplicate_registration_attempt', 'low', {
+        email,
+        ip: req.ip,
+      });
       return res.status(409).json({ error: 'User already exists' });
     }
 
@@ -35,8 +50,8 @@ router.post('/register', async (req, res) => {
       name,
       metadata: {
         source: 'bambisleep-church',
-        registered_at: new Date().toISOString()
-      }
+        registered_at: new Date().toISOString(),
+      },
     });
 
     // Create user
@@ -46,7 +61,7 @@ router.post('/register', async (req, res) => {
       name,
       password: hashedPassword,
       stripeCustomerId: customer.id,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     users.set(email, user);
@@ -56,19 +71,31 @@ router.post('/register', async (req, res) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      stripeCustomerId: user.stripeCustomerId
+      stripeCustomerId: user.stripeCustomerId,
     };
+
+    // Track successful registration
+    trackAuthAttempt('registration', 'success', user.id);
+    userRegistrations.inc({ source: 'web' });
+    authSessionsActive.inc();
+
+    logger.info('User registered successfully', {
+      userId: user.id,
+      email: user.email,
+      ip: req.ip,
+    });
 
     res.status(201).json({
       message: 'User registered successfully',
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
-      }
+        name: user.name,
+      },
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    trackAuthAttempt('registration', 'failed_error');
+    logger.error('Registration error', { error: error.message, ip: req.ip });
     res.status(500).json({ error: 'Registration failed' });
   }
 });
@@ -102,7 +129,7 @@ router.post('/login', async (req, res) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      stripeCustomerId: user.stripeCustomerId
+      stripeCustomerId: user.stripeCustomerId,
     };
 
     // Generate JWT token for API access
@@ -110,7 +137,7 @@ router.post('/login', async (req, res) => {
       {
         id: user.id,
         email: user.email,
-        stripeCustomerId: user.stripeCustomerId
+        stripeCustomerId: user.stripeCustomerId,
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -121,9 +148,9 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
+        name: user.name,
       },
-      token
+      token,
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -135,7 +162,7 @@ router.post('/login', async (req, res) => {
  * Logout user
  */
 router.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
+  req.session.destroy(err => {
     if (err) {
       return res.status(500).json({ error: 'Logout failed' });
     }
@@ -152,7 +179,7 @@ router.get('/me', (req, res) => {
   }
 
   res.json({
-    user: req.session.user
+    user: req.session.user,
   });
 });
 

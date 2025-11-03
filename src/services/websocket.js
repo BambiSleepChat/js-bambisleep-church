@@ -3,54 +3,95 @@
  * Handles live updates, avatar interactions, notifications
  */
 
+import jwt from 'jsonwebtoken';
+import {
+  logger,
+  trackAuthAttempt,
+  trackSecurityEvent,
+  websocketConnectionsTotal,
+  websocketConnectionsActive,
+  websocketMessagesTotal,
+} from './telemetry.js';
+
 const clients = new Map();
 
 export function setupWebSocket(wss) {
   wss.on('connection', (ws, req) => {
     const clientId = generateClientId();
-    
-    console.log(`👤 New WebSocket connection: ${clientId}`);
-    
+
+    // Track connection metrics
+    websocketConnectionsTotal.inc();
+    websocketConnectionsActive.inc();
+
+    logger.info('WebSocket connection established', {
+      clientId: clientId,
+      ip: req.socket.remoteAddress,
+    });
+
     // Store client
     clients.set(clientId, {
       ws,
       id: clientId,
       connectedAt: new Date().toISOString(),
       authenticated: false,
-      userId: null
+      userId: null,
     });
 
     // Send welcome message
-    ws.send(JSON.stringify({
-      type: 'welcome',
-      clientId,
-      message: 'Welcome to the BambiSleep Church Sanctuary',
-      timestamp: new Date().toISOString()
-    }));
+    ws.send(
+      JSON.stringify({
+        type: 'welcome',
+        clientId,
+        message: 'Welcome to the BambiSleep Church Sanctuary',
+        timestamp: new Date().toISOString(),
+      })
+    );
 
     // Handle incoming messages
-    ws.on('message', (message) => {
+    ws.on('message', message => {
       try {
         const data = JSON.parse(message);
+        websocketMessagesTotal.inc({
+          direction: 'inbound',
+          message_type: data.type || 'unknown',
+        });
         handleMessage(clientId, data);
       } catch (error) {
-        console.error('WebSocket message error:', error);
-        ws.send(JSON.stringify({
-          type: 'error',
-          error: 'Invalid message format'
-        }));
+        logger.error('WebSocket message error', {
+          error: error.message,
+          clientId: clientId,
+        });
+        trackSecurityEvent('websocket_invalid_message', 'low', {
+          clientId: clientId,
+          error: error.message,
+        });
+        ws.send(
+          JSON.stringify({
+            type: 'error',
+            error: 'Invalid message format',
+          })
+        );
       }
     });
 
     // Handle disconnection
     ws.on('close', () => {
-      console.log(`👤 WebSocket disconnected: ${clientId}`);
+      websocketConnectionsActive.dec();
+      logger.info('WebSocket disconnected', {
+        clientId: clientId,
+        duration:
+          Date.now() - new Date(clients.get(clientId)?.connectedAt).getTime(),
+      });
       clients.delete(clientId);
     });
 
     // Handle errors
-    ws.on('error', (error) => {
-      console.error(`WebSocket error for ${clientId}:`, error);
+    ws.on('error', error => {
+      logger.error('WebSocket error', {
+        clientId: clientId,
+        error: error.message,
+        stack: error.stack,
+      });
     });
 
     // Ping/pong for keepalive
@@ -62,7 +103,7 @@ export function setupWebSocket(wss) {
 
   // Keepalive interval
   const interval = setInterval(() => {
-    wss.clients.forEach((ws) => {
+    wss.clients.forEach(ws => {
       if (ws.isAlive === false) {
         return ws.terminate();
       }
@@ -75,7 +116,7 @@ export function setupWebSocket(wss) {
     clearInterval(interval);
   });
 
-  console.log('✅ WebSocket server initialized');
+  logger.info('WebSocket server initialized');
 }
 
 /**
@@ -94,10 +135,12 @@ function handleMessage(clientId, data) {
       break;
 
     case 'ping':
-      ws.send(JSON.stringify({
-        type: 'pong',
-        timestamp: new Date().toISOString()
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'pong',
+          timestamp: new Date().toISOString(),
+        })
+      );
       break;
 
     case 'avatar_action':
@@ -111,7 +154,7 @@ function handleMessage(clientId, data) {
         type: 'chat',
         from: client.userId || 'anonymous',
         message: data.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       break;
 
@@ -121,10 +164,12 @@ function handleMessage(clientId, data) {
       break;
 
     default:
-      ws.send(JSON.stringify({
-        type: 'error',
-        error: 'Unknown message type'
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          error: 'Unknown message type',
+        })
+      );
   }
 }
 
@@ -136,21 +181,55 @@ function handleAuth(clientId, token) {
   if (!client) return;
 
   try {
-    // TODO: Verify JWT token
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    client.authenticated = true;
-    client.userId = 'user_123'; // Replace with actual user ID from token
+    // Verify JWT token
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'change-this-secret'
+    );
 
-    client.ws.send(JSON.stringify({
-      type: 'auth_success',
-      message: 'Authentication successful'
-    }));
+    client.authenticated = true;
+    client.userId = decoded.id || decoded.userId;
+
+    trackAuthAttempt('websocket', 'success', client.userId);
+    logger.info('WebSocket authenticated', {
+      clientId: clientId,
+      userId: client.userId,
+    });
+
+    client.ws.send(
+      JSON.stringify({
+        type: 'auth_success',
+        message: 'Authentication successful',
+        userId: client.userId,
+      })
+    );
+
+    websocketMessagesTotal.inc({
+      direction: 'outbound',
+      message_type: 'auth_success',
+    });
   } catch (error) {
-    client.ws.send(JSON.stringify({
-      type: 'auth_failed',
-      error: 'Invalid authentication token'
-    }));
+    trackAuthAttempt('websocket', 'failed', null);
+    trackSecurityEvent('websocket_auth_failure', 'medium', {
+      clientId: clientId,
+      error: error.message,
+    });
+    logger.error('WebSocket auth error', {
+      clientId: clientId,
+      error: error.message,
+    });
+
+    client.ws.send(
+      JSON.stringify({
+        type: 'auth_failed',
+        error: 'Invalid authentication token',
+      })
+    );
+
+    websocketMessagesTotal.inc({
+      direction: 'outbound',
+      message_type: 'auth_failed',
+    });
   }
 }
 
@@ -160,10 +239,12 @@ function handleAuth(clientId, token) {
 function handleAvatarAction(clientId, action) {
   const client = clients.get(clientId);
   if (!client || !client.authenticated) {
-    client.ws.send(JSON.stringify({
-      type: 'error',
-      error: 'Authentication required for avatar actions'
-    }));
+    client.ws.send(
+      JSON.stringify({
+        type: 'error',
+        error: 'Authentication required for avatar actions',
+      })
+    );
     return;
   }
 
@@ -172,7 +253,7 @@ function handleAvatarAction(clientId, action) {
     type: 'avatar_update',
     userId: client.userId,
     action,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }
 
@@ -184,12 +265,14 @@ function handleRoomSubscription(clientId, room) {
   if (!client) return;
 
   client.room = room;
-  
-  client.ws.send(JSON.stringify({
-    type: 'room_joined',
-    room,
-    message: `Joined room: ${room}`
-  }));
+
+  client.ws.send(
+    JSON.stringify({
+      type: 'room_joined',
+      room,
+      message: `Joined room: ${room}`,
+    })
+  );
 }
 
 /**
@@ -197,10 +280,14 @@ function handleRoomSubscription(clientId, room) {
  */
 function broadcastToAuthenticated(message) {
   const messageStr = JSON.stringify(message);
-  
-  clients.forEach((client) => {
+
+  clients.forEach(client => {
     if (client.authenticated && client.ws.readyState === 1) {
       client.ws.send(messageStr);
+      websocketMessagesTotal.inc({
+        direction: 'outbound',
+        message_type: message.type || 'broadcast',
+      });
     }
   });
 }
@@ -210,8 +297,8 @@ function broadcastToAuthenticated(message) {
  */
 export function broadcastToRoom(room, message) {
   const messageStr = JSON.stringify(message);
-  
-  clients.forEach((client) => {
+
+  clients.forEach(client => {
     if (client.room === room && client.ws.readyState === 1) {
       client.ws.send(messageStr);
     }
@@ -247,7 +334,7 @@ export function getConnectionCount() {
  */
 export function getAuthenticatedCount() {
   let count = 0;
-  clients.forEach((client) => {
+  clients.forEach(client => {
     if (client.authenticated) count++;
   });
   return count;

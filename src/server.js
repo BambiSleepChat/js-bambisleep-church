@@ -11,6 +11,17 @@ import morgan from 'morgan';
 import session from 'express-session';
 import rateLimit from 'express-rate-limit';
 
+// Import telemetry service (must be first for OpenTelemetry auto-instrumentation)
+import {
+  logger,
+  telemetryMiddleware,
+  securityMonitoringMiddleware,
+  promRegistry,
+} from './services/telemetry.js';
+
+// Import MCP Server Manager
+import { mcpManager } from './services/mcp-manager.js';
+
 // Import routes
 import markdownRouter from './routes/markdown.js';
 import stripeRouter from './routes/stripe.js';
@@ -35,32 +46,37 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || 'localhost';
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      frameSrc: ["https://js.stripe.com"],
-      connectSrc: ["'self'", "wss:", "ws:"],
-      imgSrc: ["'self'", "data:", "https:"],
-      mediaSrc: ["'self'", "blob:"]
-    }
-  }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://js.stripe.com'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        frameSrc: ['https://js.stripe.com'],
+        connectSrc: ["'self'", 'wss:', 'ws:'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        mediaSrc: ["'self'", 'blob:'],
+      },
+    },
+  })
+);
 
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://bambisleep.church' 
-    : 'http://localhost:3000',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? 'https://bambisleep.church'
+        : 'http://localhost:3000',
+    credentials: true,
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api/', limiter);
 
@@ -71,20 +87,26 @@ app.use(express.urlencoded({ extended: true }));
 // Compression
 app.use(compression());
 
+// Telemetry and monitoring middleware
+app.use(telemetryMiddleware());
+app.use(securityMonitoringMiddleware());
+
 // Logging
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Session management
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-this-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'change-this-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
 
 // Static files
 app.use(express.static(join(__dirname, '../public')));
@@ -103,16 +125,56 @@ app.use('/video', videoRouter);
 app.get('/', (req, res) => {
   res.render('index', {
     title: 'BambiSleep Church - Aristocratic Sanctuary',
-    user: req.session.user || null
+    user: req.session.user || null,
   });
 });
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
+// Health check (enhanced with telemetry)
+app.get('/health', async (req, res) => {
+  const healthData = {
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    version: process.env.npm_package_version || '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    memory: process.memoryUsage(),
+    metrics: {
+      available: true,
+      endpoint: 'http://localhost:9464/metrics',
+    },
+  };
+
+  logger.info('Health check requested', { ip: req.ip });
+  res.json(healthData);
+});
+
+// Prometheus metrics endpoint (proxied from port 9464)
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', promRegistry.contentType);
+    const metrics = await promRegistry.metrics();
+    res.end(metrics);
+  } catch (error) {
+    logger.error('Error fetching metrics', { error: error.message });
+    res.status(500).end(error.message);
+  }
+});
+
+// DORA metrics endpoint (human-readable dashboard)
+app.get('/dora', (req, res) => {
+  res.json({
+    message: 'DORA Metrics Dashboard',
+    info: 'DevOps Research and Assessment metrics for continuous improvement',
+    metrics: {
+      deployment_frequency:
+        'Track via /metrics endpoint: deployment_frequency_total',
+      lead_time_for_changes:
+        'Track via /metrics endpoint: deployment_lead_time_seconds',
+      change_failure_rate:
+        'Track via /metrics endpoint: change_failure_rate_total',
+      mean_time_to_recovery: 'Track via /metrics endpoint: mttr_seconds',
+    },
+    prometheus_url: 'http://localhost:9464/metrics',
   });
 });
 
@@ -120,42 +182,88 @@ app.get('/health', (req, res) => {
 app.use((req, res) => {
   res.status(404).render('404', {
     title: 'Lost in the Sanctuary',
-    path: req.path
+    path: req.path,
   });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  logger.error('Application error', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip,
+  });
+
   res.status(err.status || 500).render('error', {
     title: 'Error',
-    message: process.env.NODE_ENV === 'production' 
-      ? 'An error occurred' 
-      : err.message,
-    error: process.env.NODE_ENV === 'production' ? {} : err
+    message:
+      process.env.NODE_ENV === 'production' ? 'An error occurred' : err.message,
+    error: process.env.NODE_ENV === 'production' ? {} : err,
   });
 });
 
 // Setup WebSocket
 setupWebSocket(wss);
 
+// Initialize custom MCP servers
+mcpManager.initialize().catch((error) => {
+  logger.error('Failed to initialize MCP servers:', error);
+});
+
+// MCP Server status endpoint
+app.get('/api/mcp/status', (req, res) => {
+  const status = mcpManager.getServerStatus();
+  res.json({
+    servers: status,
+    total: status.length,
+    running: status.filter(s => s.status === 'running').length,
+  });
+});
+
 // Start server
 server.listen(PORT, HOST, () => {
+  logger.info('BambiSleep Church Server Started', {
+    environment: process.env.NODE_ENV || 'development',
+    http: `http://${HOST}:${PORT}`,
+    websocket: `ws://${HOST}:${PORT}`,
+    metrics: 'http://localhost:9464/metrics',
+    health: `http://${HOST}:${PORT}/health`,
+    dora: `http://${HOST}:${PORT}/dora`,
+    mcp_servers: mcpManager.getServerStatus().length,
+  });
+
   console.log(`
   👑 BambiSleep Church Server
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Environment: ${process.env.NODE_ENV || 'development'}
   HTTP Server: http://${HOST}:${PORT}
   WebSocket: ws://${HOST}:${PORT}
+  Metrics: http://localhost:9464/metrics
+  Health: http://${HOST}:${PORT}/health
+  DORA: http://${HOST}:${PORT}/dora
+  MCP Servers: ${mcpManager.getServerStatus().length}
+  MCP Status: http://${HOST}:${PORT}/api/mcp/status
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   `);
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, initiating graceful shutdown');
+  await mcpManager.shutdown();
   server.close(() => {
-    console.log('Server closed');
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, initiating graceful shutdown');
+  await mcpManager.shutdown();
+  server.close(() => {
+    logger.info('HTTP server closed');
     process.exit(0);
   });
 });

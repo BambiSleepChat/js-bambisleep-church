@@ -1,0 +1,242 @@
+{
+  "dashboard": {
+    "title": "BambiSleep Church - DORA Metrics",
+    "tags": [
+      "dora",
+      "devops",
+      "performance"
+    ],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Deployment Frequency (per day)",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "increase(deployment_frequency[1d])",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "red"
+                },
+                {
+                  "value": 1,
+                  "color": "yellow"
+                },
+                {
+                  "value": 5,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Lead Time for Changes (minutes)",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "rate(lead_time_seconds_sum[1d]) / rate(lead_time_seconds_count[1d]) / 60",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "m",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "green"
+                },
+                {
+                  "value": 60,
+                  "color": "yellow"
+                },
+                {
+                  "value": 480,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Change Failure Rate (%)",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "change_failure_rate * 100",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "green"
+                },
+                {
+                  "value": 10,
+                  "color": "yellow"
+                },
+                {
+                  "value": 20,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "MTTR - Mean Time To Recovery (hours)",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "rate(mttr_seconds_sum[7d]) / rate(mttr_seconds_count[7d]) / 3600",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "h",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "green"
+                },
+                {
+                  "value": 1,
+                  "color": "yellow"
+                },
+                {
+                  "value": 4,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Deployment Frequency Trend",
+        "type": "graph",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "increase(deployment_frequency[1h])",
+            "legendFormat": "Deployments",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Deployments"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Lead Time Trend",
+        "type": "graph",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(lead_time_seconds_sum[1h]) / rate(lead_time_seconds_count[1h]) / 60",
+            "legendFormat": "Lead Time (minutes)",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "m",
+            "label": "Minutes"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      }
+    ]
+  }
+}

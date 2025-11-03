@@ -156,6 +156,29 @@ pm2 logs                       # Check logs/pm2-*.log
 - `STRIPE_SECRET_KEY`, `VIDEO_SIGNING_KEY`
 - `SLACK_WEBHOOK_URL` (optional, for Alertmanager)
 
+### **🚀 WSL Performance: File Storage Location Matters**
+
+**Critical deployment consideration for WSL environments:**
+
+```bash
+# ❌ 10x SLOWER: Project on Windows drive, accessed via WSL
+/mnt/f/CATHEDRAL/bambisleep-church
+# Impact: Slow git, npm install, file watching (nodemon), Docker bind mounts
+
+# ✅ OPTIMAL: Project in native WSL filesystem
+/home/melkanea/CATHEDRAL/bambisleep-church (or \\wsl$\Debian\...)
+# Impact: Full Linux I/O performance for all operations
+```
+
+**Microsoft's Rule:** Store files on the SAME filesystem as the tools using them.
+
+**Production deployments:**
+- If deploying to Linux VPS → Develop in WSL filesystem (`~/project`)
+- If using Windows IIS → Develop in Windows filesystem (`/mnt/c/project`)
+- Docker performance: WSL filesystem volumes are 5-10x faster than `/mnt/` mounts
+
+**Reference:** [WSL File Storage Guide](https://learn.microsoft.com/en-gb/windows/wsl/setup/environment#file-storage)
+
 ---
 
 ## ⚠️ Sacred Invariants (Never Change)
