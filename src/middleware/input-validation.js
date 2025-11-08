@@ -12,7 +12,7 @@ export function validateRequest(req, res, next) {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       error: 'Validation failed',
-      details: errors.array().map((err) => ({
+      details: errors.array().map(err => ({
         field: err.path || err.param,
         message: err.msg,
         value: err.value,
@@ -76,7 +76,9 @@ export const validators = {
    */
   filename: body('filename')
     .matches(/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/)
-    .withMessage('Invalid filename format - alphanumeric with single extension only'),
+    .withMessage(
+      'Invalid filename format - alphanumeric with single extension only'
+    ),
 
   /**
    * Safe file path validation (prevent directory traversal)
@@ -114,8 +116,11 @@ export const validators = {
   /**
    * Positive integer validation
    */
-  positiveInt: (fieldName) =>
-    body(fieldName).isInt({ min: 1 }).toInt().withMessage(`${fieldName} must be positive integer`),
+  positiveInt: fieldName =>
+    body(fieldName)
+      .isInt({ min: 1 })
+      .toInt()
+      .withMessage(`${fieldName} must be positive integer`),
 
   /**
    * Amount validation (currency in cents)
@@ -130,7 +135,7 @@ export const validators = {
    */
   json: body('data')
     .isJSON()
-    .customSanitizer((value) => {
+    .customSanitizer(value => {
       try {
         return JSON.parse(value);
       } catch {
@@ -143,7 +148,16 @@ export const validators = {
    * MCP server name validation
    */
   mcpServerName: body('serverName')
-    .isIn(['filesystem', 'memory', 'git', 'github', 'brave-search', 'sequential-thinking', 'postgres', 'everything'])
+    .isIn([
+      'filesystem',
+      'memory',
+      'git',
+      'github',
+      'brave-search',
+      'sequential-thinking',
+      'postgres',
+      'everything',
+    ])
     .withMessage('Invalid MCP server name'),
 
   /**
@@ -179,18 +193,28 @@ export function sanitizeInput(fieldName) {
  * Blocks private IP ranges and localhost
  */
 export function validatePublicURL(fieldName) {
-  return body(fieldName).custom((value) => {
+  return body(fieldName).custom(value => {
     const url = new URL(value);
 
     // Block localhost and loopback
-    const blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '::1', '169.254.169.254'];
+    const blockedHosts = [
+      'localhost',
+      '127.0.0.1',
+      '0.0.0.0',
+      '::1',
+      '169.254.169.254',
+    ];
     if (blockedHosts.includes(url.hostname.toLowerCase())) {
       throw new Error('Private/internal URLs not allowed');
     }
 
     // Block private IP ranges
-    const privateRanges = [/^10\./, /^172\.(1[6-9]|2\d|3[01])\./, /^192\.168\./];
-    if (privateRanges.some((range) => range.test(url.hostname))) {
+    const privateRanges = [
+      /^10\./,
+      /^172\.(1[6-9]|2\d|3[01])\./,
+      /^192\.168\./,
+    ];
+    if (privateRanges.some(range => range.test(url.hostname))) {
       throw new Error('Private IP ranges not allowed');
     }
 

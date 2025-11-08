@@ -25,35 +25,117 @@ const CUSTOM_MCP_SERVERS = {
   'bambisleep-hypnosis-mcp': {
     name: 'BambiSleep™ Hypnosis Audio Management',
     layer: MCPRingLayer.LAYER_2,
-    path: process.env.HYPNOSIS_MCP_PATH || join(__dirname, '..', '..', '..', 'bambisleep-chat-catgirl', 'mcp-servers', 'bambisleep-hypnosis-mcp', 'index.js'),
+    path:
+      process.env.HYPNOSIS_MCP_PATH ||
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'bambisleep-chat-catgirl',
+        'mcp-servers',
+        'bambisleep-hypnosis-mcp',
+        'index.js'
+      ),
     enabled: process.env.ENABLE_HYPNOSIS_MCP !== 'false',
-    tools: ['add_audio_file', 'search_audio', 'create_playlist', 'get_playlist', 'list_triggers'],
+    tools: [
+      'add_audio_file',
+      'search_audio',
+      'create_playlist',
+      'get_playlist',
+      'list_triggers',
+    ],
     resources: ['bambisleep://audio/library', 'bambisleep://playlists/{id}'],
   },
   'aigf-personality-mcp': {
     name: 'AI Girlfriend Personality Management',
     layer: MCPRingLayer.LAYER_2,
-    path: process.env.PERSONALITY_MCP_PATH || join(__dirname, '..', '..', '..', 'bambisleep-chat-catgirl', 'mcp-servers', 'aigf-personality-mcp', 'index.js'),
+    path:
+      process.env.PERSONALITY_MCP_PATH ||
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'bambisleep-chat-catgirl',
+        'mcp-servers',
+        'aigf-personality-mcp',
+        'index.js'
+      ),
     enabled: process.env.ENABLE_PERSONALITY_MCP !== 'false',
-    tools: ['create_personality', 'switch_personality', 'update_mood', 'add_context', 'get_trigger_response', 'list_profiles'],
+    tools: [
+      'create_personality',
+      'switch_personality',
+      'update_mood',
+      'add_context',
+      'get_trigger_response',
+      'list_profiles',
+    ],
     resources: ['aigf://profile/active', 'aigf://profiles/{id}'],
     prompts: ['personality_greeting', 'personality_response'],
   },
   'trigger-system-mcp': {
     name: 'Hypnotic Trigger Management',
     layer: MCPRingLayer.LAYER_2,
-    path: process.env.TRIGGER_SYSTEM_MCP_PATH || join(__dirname, '..', '..', '..', 'bambisleep-chat-catgirl', 'mcp-servers', 'trigger-system-mcp', 'index.js'),
+    path:
+      process.env.TRIGGER_SYSTEM_MCP_PATH ||
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'bambisleep-chat-catgirl',
+        'mcp-servers',
+        'trigger-system-mcp',
+        'index.js'
+      ),
     enabled: process.env.ENABLE_TRIGGER_SYSTEM_MCP !== 'false',
-    tools: ['register_trigger', 'activate_trigger', 'search_triggers', 'get_trigger', 'get_activation_history', 'get_compliance_stats'],
-    resources: ['triggers://registry', 'triggers://logs', 'triggers://compliance'],
+    tools: [
+      'register_trigger',
+      'activate_trigger',
+      'search_triggers',
+      'get_trigger',
+      'get_activation_history',
+      'get_compliance_stats',
+    ],
+    resources: [
+      'triggers://registry',
+      'triggers://logs',
+      'triggers://compliance',
+    ],
   },
   'chat-analytics-mcp': {
     name: 'Chat Analytics & Metrics',
     layer: MCPRingLayer.LAYER_2,
-    path: process.env.ANALYTICS_MCP_PATH || join(__dirname, '..', '..', '..', 'bambisleep-chat-catgirl', 'mcp-servers', 'chat-analytics-mcp', 'index.js'),
+    path:
+      process.env.ANALYTICS_MCP_PATH ||
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'bambisleep-chat-catgirl',
+        'mcp-servers',
+        'chat-analytics-mcp',
+        'index.js'
+      ),
     enabled: process.env.ENABLE_ANALYTICS_MCP !== 'false',
-    tools: ['start_session', 'end_session', 'record_message', 'record_trigger_activation', 'record_conversion', 'get_analytics', 'get_user_engagement'],
-    resources: ['analytics://sessions/active', 'analytics://sessions/completed', 'analytics://users/engagement', 'analytics://conversions', 'analytics://summary'],
+    tools: [
+      'start_session',
+      'end_session',
+      'record_message',
+      'record_trigger_activation',
+      'record_conversion',
+      'get_analytics',
+      'get_user_engagement',
+    ],
+    resources: [
+      'analytics://sessions/active',
+      'analytics://sessions/completed',
+      'analytics://users/engagement',
+      'analytics://conversions',
+      'analytics://summary',
+    ],
   },
 };
 
@@ -92,7 +174,9 @@ class MCPServerManager extends EventEmitter {
       }
     }
 
-    logger.info(`[MCP-Manager] Initialized ${this.servers.size}/${Object.keys(CUSTOM_MCP_SERVERS).filter(k => CUSTOM_MCP_SERVERS[k].enabled).length} custom MCP servers`);
+    logger.info(
+      `[MCP-Manager] Initialized ${this.servers.size}/${Object.keys(CUSTOM_MCP_SERVERS).filter(k => CUSTOM_MCP_SERVERS[k].enabled).length} custom MCP servers`
+    );
   }
 
   /**
@@ -114,28 +198,34 @@ class MCPServerManager extends EventEmitter {
     });
 
     // Handle process output
-    process.stdout.on('data', (data) => {
+    process.stdout.on('data', data => {
       logger.debug(`[${serverId}] stdout: ${data.toString().trim()}`);
     });
 
-    process.stderr.on('data', (data) => {
+    process.stderr.on('data', data => {
       const message = data.toString().trim();
       // Filter out INFO/DEBUG logs from MCP servers
-      if (message.includes('[AIGF-MCP]') || message.includes('[TRIGGER-MCP]') || message.includes('[ANALYTICS-MCP]')) {
+      if (
+        message.includes('[AIGF-MCP]') ||
+        message.includes('[TRIGGER-MCP]') ||
+        message.includes('[ANALYTICS-MCP]')
+      ) {
         logger.debug(`[${serverId}] ${message}`);
       } else {
         logger.error(`[${serverId}] stderr: ${message}`);
       }
     });
 
-    process.on('error', (error) => {
+    process.on('error', error => {
       logger.error(`[${serverId}] Process error:`, error);
       this.emit('serverError', { serverId, error });
       this.handleServerFailure(serverId, config);
     });
 
     process.on('exit', (code, signal) => {
-      logger.warn(`[${serverId}] Process exited with code ${code}, signal ${signal}`);
+      logger.warn(
+        `[${serverId}] Process exited with code ${code}, signal ${signal}`
+      );
       this.processes.delete(serverId);
       this.servers.delete(serverId);
       this.emit('serverExited', { serverId, code, signal });
@@ -166,13 +256,18 @@ class MCPServerManager extends EventEmitter {
 
     if (attempts < this.maxRetries) {
       this.connectionAttempts.set(serverId, attempts + 1);
-      logger.warn(`[MCP-Manager] Retrying ${serverId} (attempt ${attempts + 1}/${this.maxRetries})...`);
+      logger.warn(
+        `[MCP-Manager] Retrying ${serverId} (attempt ${attempts + 1}/${this.maxRetries})...`
+      );
 
-      setTimeout(() => {
-        this.startServer(serverId, config).catch((error) => {
-          logger.error(`[MCP-Manager] Retry failed for ${serverId}:`, error);
-        });
-      }, 5000 * (attempts + 1)); // Exponential backoff
+      setTimeout(
+        () => {
+          this.startServer(serverId, config).catch(error => {
+            logger.error(`[MCP-Manager] Retry failed for ${serverId}:`, error);
+          });
+        },
+        5000 * (attempts + 1)
+      ); // Exponential backoff
     } else {
       logger.error(`[MCP-Manager] Max retries exceeded for ${serverId}`);
       this.emit('serverMaxRetriesExceeded', { serverId });
@@ -221,7 +316,9 @@ class MCPServerManager extends EventEmitter {
   stopServer(serverId) {
     const process = this.processes.get(serverId);
     if (process) {
-      logger.info(`[MCP-Manager] Stopping ${serverId} (PID: ${process.pid})...`);
+      logger.info(
+        `[MCP-Manager] Stopping ${serverId} (PID: ${process.pid})...`
+      );
       process.kill('SIGTERM');
     }
   }
@@ -234,7 +331,9 @@ class MCPServerManager extends EventEmitter {
     logger.info('[MCP-Manager] Shutting down all custom MCP servers...');
 
     for (const [serverId, process] of this.processes.entries()) {
-      logger.info(`[MCP-Manager] Stopping ${serverId} (PID: ${process.pid})...`);
+      logger.info(
+        `[MCP-Manager] Stopping ${serverId} (PID: ${process.pid})...`
+      );
       process.kill('SIGTERM');
     }
 
@@ -258,9 +357,4 @@ class MCPServerManager extends EventEmitter {
 //-> Strategy: Export manager instance and constants
 const mcpManager = new MCPServerManager();
 
-export {
-  mcpManager,
-  MCPServerManager,
-  MCPRingLayer,
-  CUSTOM_MCP_SERVERS,
-};
+export { mcpManager, MCPServerManager, MCPRingLayer, CUSTOM_MCP_SERVERS };

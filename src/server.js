@@ -88,7 +88,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(compression());
 
 /// 🛡️ OWASP Security Middleware (MUST be early in middleware chain)
-import { securityHeaders, enforceHTTPS } from './middleware/security-headers.js';
+import {
+  securityHeaders,
+  enforceHTTPS,
+} from './middleware/security-headers.js';
 import { apiLimiter } from './middleware/rate-limiting.js';
 
 // HTTPS enforcement (production only)
@@ -110,26 +113,32 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 /// 🛡️ OWASP A02: Cryptographic Failures - Strong SESSION_SECRET enforcement
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
   logger.error('❌ SESSION_SECRET not set or too weak (minimum 32 characters)');
-  logger.error('Generate a strong secret with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
-  
+  logger.error(
+    "Generate a strong secret with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+  );
+
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('SESSION_SECRET must be set in production with minimum 32 characters');
+    throw new Error(
+      'SESSION_SECRET must be set in production with minimum 32 characters'
+    );
   }
-  
+
   logger.warn('⚠️ Using temporary session secret - NOT FOR PRODUCTION');
 }
 
 // Session management with secure configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex'),
+    secret:
+      process.env.SESSION_SECRET ||
+      require('crypto').randomBytes(32).toString('hex'),
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      httpOnly: true,                                 // Prevent XSS cookie theft
-      sameSite: 'strict',                             // CSRF protection
-      maxAge: 24 * 60 * 60 * 1000,                    // 24 hours
+      httpOnly: true, // Prevent XSS cookie theft
+      sameSite: 'strict', // CSRF protection
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   })
 );
@@ -234,7 +243,7 @@ app.use((err, req, res, next) => {
 setupWebSocket(wss);
 
 // Initialize custom MCP servers
-mcpManager.initialize().catch((error) => {
+mcpManager.initialize().catch(error => {
   logger.error('Failed to initialize MCP servers:', error);
 });
 
@@ -278,11 +287,11 @@ server.listen(PORT, HOST, () => {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, initiating graceful shutdown');
-  
+
   /// 🛡️ Close rate limiter Redis connection
   const { closeRateLimiter } = await import('./middleware/rate-limiting.js');
   await closeRateLimiter();
-  
+
   await mcpManager.shutdown();
   server.close(() => {
     logger.info('HTTP server closed');
@@ -292,11 +301,11 @@ process.on('SIGTERM', async () => {
 
 process.on('SIGINT', async () => {
   logger.info('SIGINT received, initiating graceful shutdown');
-  
+
   /// 🛡️ Close rate limiter Redis connection
   const { closeRateLimiter } = await import('./middleware/rate-limiting.js');
   await closeRateLimiter();
-  
+
   await mcpManager.shutdown();
   server.close(() => {
     logger.info('HTTP server closed');

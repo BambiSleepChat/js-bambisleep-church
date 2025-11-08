@@ -18,14 +18,16 @@ const createRedisClient = () => {
     const redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
       port: process.env.REDIS_PORT || 6379,
-      retryStrategy: (times) => {
+      retryStrategy: times => {
         const delay = Math.min(times * 50, 2000);
-        logger.warn(`Redis connection retry attempt ${times}, delay ${delay}ms`);
+        logger.warn(
+          `Redis connection retry attempt ${times}, delay ${delay}ms`
+        );
         return delay;
       },
     });
 
-    redis.on('error', (err) => {
+    redis.on('error', err => {
       logger.error('Redis rate limiter error:', err);
     });
 
@@ -54,7 +56,7 @@ function createRateLimiter(options) {
     message: { error: options.message },
     standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
-    skip: (req) => process.env.NODE_ENV === 'test', // Skip in tests
+    skip: req => process.env.NODE_ENV === 'test', // Skip in tests
     handler: (req, res) => {
       logger.warn('Rate limit exceeded', {
         ip: req.ip,

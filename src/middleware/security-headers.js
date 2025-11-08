@@ -13,13 +13,14 @@ export const securityHeaders = helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline for Unity WebGL
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "wss:", "https:"], // WebSocket + HTTPS for MCP
-      fontSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'wss:', 'https:'], // WebSocket + HTTPS for MCP
+      fontSrc: ["'self'", 'data:'],
       objectSrc: ["'none'"],
-      mediaSrc: ["'self'", "blob:"],
+      mediaSrc: ["'self'", 'blob:'],
       frameSrc: ["'none'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+      upgradeInsecureRequests:
+        process.env.NODE_ENV === 'production' ? [] : null,
     },
   },
 

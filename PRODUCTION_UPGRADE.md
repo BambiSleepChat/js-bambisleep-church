@@ -13,12 +13,14 @@
 Added **4 custom MCP servers** from `bambisleep-chat-catgirl`:
 
 #### bambisleep-hypnosis-mcp
+
 - **Purpose**: Audio file and playlist management
 - **Tools**: 5 (add_audio_file, search_audio, create_playlist, get_playlist, list_triggers)
 - **Resources**: 2 (audio library, playlists)
 - **Path**: `../bambisleep-chat-catgirl/mcp-servers/bambisleep-hypnosis-mcp/`
 
 #### aigf-personality-mcp
+
 - **Purpose**: AI girlfriend personality switching and mood management
 - **Tools**: 6 (create_personality, switch_personality, update_mood, add_context, get_trigger_response, list_profiles)
 - **Resources**: 2 (active profile, all profiles)
@@ -26,15 +28,19 @@ Added **4 custom MCP servers** from `bambisleep-chat-catgirl`:
 - **Path**: `../bambisleep-chat-catgirl/mcp-servers/aigf-personality-mcp/`
 
 #### trigger-system-mcp
+
 - **Purpose**: Hypnotic trigger registration with compliance enforcement
-- **Tools**: 6 (register_trigger, activate_trigger, search_triggers, get_trigger, get_activation_history, get_compliance_stats)
+- **Tools**: 6 (register_trigger, activate_trigger, search_triggers, get_trigger, get_activation_history,
+  get_compliance_stats)
 - **Resources**: 3 (registry, logs, compliance stats)
 - **Ethical Safeguards**: Compliance acknowledgment required for activation
 - **Path**: `../bambisleep-chat-catgirl/mcp-servers/trigger-system-mcp/`
 
 #### chat-analytics-mcp
+
 - **Purpose**: User engagement and conversion tracking
-- **Tools**: 7 (start_session, end_session, record_message, record_trigger_activation, record_conversion, get_analytics, get_user_engagement)
+- **Tools**: 7 (start_session, end_session, record_message, record_trigger_activation, record_conversion, get_analytics,
+  get_user_engagement)
 - **Resources**: 5 (active sessions, completed sessions, user engagement, conversions, summary)
 - **Path**: `../bambisleep-chat-catgirl/mcp-servers/chat-analytics-mcp/`
 
@@ -43,6 +49,7 @@ Added **4 custom MCP servers** from `bambisleep-chat-catgirl`:
 **File**: `src/services/mcp-manager.js` (283 lines)
 
 **Features**:
+
 - **EventEmitter-based lifecycle management** for child processes
 - **Automatic retry logic** with exponential backoff (max 3 retries)
 - **Graceful shutdown** with SIGTERM → 2s wait → SIGKILL fallback
@@ -50,6 +57,7 @@ Added **4 custom MCP servers** from `bambisleep-chat-catgirl`:
 - **Status API** for health checks
 
 **Ring Layer Architecture**:
+
 ```
 Layer 0: Primitives (filesystem, memory)
 Layer 1: Foundation (git, github, brave-search)
@@ -61,6 +69,7 @@ Layer 2: Advanced (custom MCP servers) ← NEW
 **Modified**: `src/server.js`
 
 **Changes**:
+
 1. Import `mcpManager` from `./services/mcp-manager.js`
 2. Call `mcpManager.initialize()` after WebSocket setup
 3. Added `/api/mcp/status` endpoint for server status
@@ -72,6 +81,7 @@ Layer 2: Advanced (custom MCP servers) ← NEW
 **Modified**: `.env.example`
 
 **New Variables**:
+
 ```bash
 # Custom MCP Servers (Layer 2 - Advanced)
 ENABLE_HYPNOSIS_MCP=true
@@ -104,6 +114,7 @@ npm run dev
 ```
 
 The server will automatically:
+
 1. Initialize OpenTelemetry observability
 2. Start Express HTTP server on port 3000
 3. Initialize WebSocket server
@@ -113,11 +124,13 @@ The server will automatically:
 ### Checking MCP Server Status
 
 **HTTP API**:
+
 ```bash
 curl http://localhost:3000/api/mcp/status
 ```
 
 **Response**:
+
 ```json
 {
   "servers": [
@@ -131,7 +144,7 @@ curl http://localhost:3000/api/mcp/status
       "startTime": "2025-11-03T12:00:00.000Z",
       "tools": 5,
       "resources": 2
-    },
+    }
     // ... 3 more servers
   ],
   "total": 4,
@@ -199,6 +212,7 @@ The following Express routes need to be created to expose MCP tools via HTTP:
 The MCP manager emits events that can be integrated with existing OpenTelemetry/Prometheus metrics:
 
 **EventEmitter Events**:
+
 - `serverStarted` - MCP server successfully started
 - `serverFailed` - MCP server failed to start
 - `serverError` - Runtime error in MCP server process
@@ -206,17 +220,18 @@ The MCP manager emits events that can be integrated with existing OpenTelemetry/
 - `serverMaxRetriesExceeded` - Exceeded retry limit
 
 **Future Metrics** (to add to `src/services/telemetry.js`):
+
 ```javascript
 const mcpServerStatus = new promClient.Gauge({
   name: 'mcp_server_status',
   help: 'MCP server status (1 = running, 0 = stopped)',
-  labelNames: ['server_id', 'server_name', 'layer']
+  labelNames: ['server_id', 'server_name', 'layer'],
 });
 
 const mcpServerRestarts = new promClient.Counter({
   name: 'mcp_server_restarts_total',
   help: 'Total MCP server restarts',
-  labelNames: ['server_id', 'reason']
+  labelNames: ['server_id', 'reason'],
 });
 ```
 
@@ -232,21 +247,22 @@ const mcpServerRestarts = new promClient.Counter({
 // ❌ WILL THROW ERROR
 await callTool('activate_trigger', {
   triggerId: 'trigger-123',
-  complianceAcknowledged: false  // Missing or false
+  complianceAcknowledged: false, // Missing or false
 });
 
 // ✅ CORRECT
 await callTool('activate_trigger', {
   triggerId: 'trigger-123',
-  complianceAcknowledged: true,  // Required
+  complianceAcknowledged: true, // Required
   userId: 'user-456',
-  context: { sessionId: 'session-789' }
+  context: { sessionId: 'session-789' },
 });
 ```
 
 ### Process Isolation
 
 Each MCP server runs as an **isolated child process**:
+
 - Separate Node.js runtime
 - Independent memory space
 - Crash isolation (one server crash doesn't affect others)
@@ -261,6 +277,7 @@ Each MCP server runs as an **isolated child process**:
 **Symptom**: Server shows `status: 'stopped'` in `/api/mcp/status`
 
 **Solutions**:
+
 1. Check MCP server path is correct (relative from bambisleep-church)
 2. Verify Node.js 20+ is installed
 3. Run `npm install` in each MCP server directory
@@ -272,6 +289,7 @@ Each MCP server runs as an **isolated child process**:
 **Symptom**: Logs show multiple restart attempts
 
 **Solutions**:
+
 1. Check stderr logs for error messages
 2. Verify MCP server dependencies are installed
 3. Check for port conflicts
@@ -283,6 +301,7 @@ Each MCP server runs as an **isolated child process**:
 **Symptom**: Server doesn't exit cleanly on SIGTERM
 
 **Solutions**:
+
 1. Check MCP server processes respond to SIGTERM
 2. Verify 2-second timeout is sufficient (adjust in `mcp-manager.js`)
 3. Use SIGKILL if SIGTERM fails: `pkill -9 node`
@@ -292,12 +311,14 @@ Each MCP server runs as an **isolated child process**:
 ## 📈 Next Steps
 
 ### Immediate (This Session)
+
 - [ ] Copy `src/agent/agent-coordinator.js` from bambisleep-chat-catgirl
 - [ ] Add Express API routes for MCP tools
 - [ ] Create production deployment infrastructure (docker-compose.prod.yml)
 - [ ] Add PostgreSQL persistence for chat-analytics-mcp
 
 ### Short-Term (Next Session)
+
 - [ ] Add Prometheus metrics for MCP server health
 - [ ] Create Grafana dashboard for MCP monitoring
 - [ ] Implement authentication for MCP API endpoints
@@ -305,6 +326,7 @@ Each MCP server runs as an **isolated child process**:
 - [ ] Write integration tests for MCP manager
 
 ### Long-Term
+
 - [ ] Migrate from Express to Next.js for React SSR
 - [ ] Add Redis caching for MCP responses
 - [ ] Implement MCP tool batching/pipelining
@@ -315,12 +337,12 @@ Each MCP server runs as an **isolated child process**:
 
 ## 📝 Files Changed
 
-| File | Type | Lines | Description |
-|------|------|-------|-------------|
-| `src/services/mcp-manager.js` | Created | 283 | MCP server lifecycle management |
-| `src/server.js` | Modified | +15 | Import and initialize MCP manager |
-| `.env.example` | Modified | +13 | Custom MCP server configuration |
-| `PRODUCTION_UPGRADE.md` | Created | 350+ | This document |
+| File                          | Type     | Lines | Description                       |
+| ----------------------------- | -------- | ----- | --------------------------------- |
+| `src/services/mcp-manager.js` | Created  | 283   | MCP server lifecycle management   |
+| `src/server.js`               | Modified | +15   | Import and initialize MCP manager |
+| `.env.example`                | Modified | +13   | Custom MCP server configuration   |
+| `PRODUCTION_UPGRADE.md`       | Created  | 350+  | This document                     |
 
 **Total**: 1 new service, 3 modified files, 650+ lines of new code
 
@@ -329,6 +351,7 @@ Each MCP server runs as an **isolated child process**:
 ## 🌸 Success Criteria
 
 ✅ **Phase 1 Complete** when:
+
 - [x] 4 custom MCP servers start automatically with Express server
 - [x] `/api/mcp/status` endpoint returns server health
 - [x] Graceful shutdown stops all MCP servers
@@ -336,6 +359,7 @@ Each MCP server runs as an **isolated child process**:
 - [x] Documented configuration in `.env.example`
 
 🚧 **Phase 2 In Progress**:
+
 - [ ] Express API routes expose MCP tools
 - [ ] Commander-Brandynette agent authority integrated
 - [ ] Production deployment infrastructure ready
